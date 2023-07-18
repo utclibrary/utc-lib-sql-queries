@@ -3,21 +3,22 @@ Vendor.VendorName AS vendor,
 db.Title AS name,
 db.URL AS url,
 (CASE db.NotProxy  WHEN 1 THEN 0 ELSE 1 END) AS enable_proxy,
-db.ShortDescription AS description,
 CONCAT(
+db.ShortDescription, 
 CASE
 	WHEN db.TutorialURL = '' OR db.TutorialURL IS NULL THEN
     ''
     ELSE
-    CONCAT ('<a href="', db.TutorialURL , '">', db.TutorialURL , '</a>')
-END,
+    CONCAT (' <i class="fa fa-question-circle" aria-hidden="true"></i> <a href="', db.TutorialURL , '">', db.Title , ' Tip Sheet</a>')
+END)
+AS description,
 CASE 
 	WHEN db.HighlightedInfo = '' OR db.HighlightedInfo IS NULL THEN
 	''
     ELSE
     db.HighlightedInfo
 END
-) AS more_info,
+AS more_info,
 db.New AS enable_new,
 CASE 
 WHEN db.HighlightedInfo LIKE '%TRIAL%' THEN 1 ELSE 0 
@@ -55,7 +56,7 @@ LEFT JOIN LuptonDB.DBRanking
 ON db.Key_ID  = DBRanking.Key_ID
 LEFT JOIN LuptonDB.SubjectList
 ON DBRanking.Subject_ID = SubjectList.Subject_ID
-WHERE CANCELLED = 0 AND MASKED = 0 AND db.Key_ID <> 529
+WHERE CANCELLED = 0 AND MASKED = 0 AND db.Key_ID <> 529 AND db.Key_ID < 50
 GROUP BY db.Title
 ORDER BY db.Key_ID
 ;
