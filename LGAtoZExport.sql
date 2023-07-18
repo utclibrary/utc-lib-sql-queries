@@ -17,10 +17,15 @@ CASE
   db.ShortURL
 END
 AS slug,
-'' AS best_bets,
-GROUP_CONCAT(SubjectList.Subject separator ';') AS subjects,
+IFNULL(
+GROUP_CONCAT(distinct if (SubjectList.NotSubjectList=0 AND DBRanking.TryTheseFirst=1 , SubjectList.Subject, NULL ) order by SubjectList.Subject separator ';')
+, '')
+AS best_bets,
+IFNULL(
+GROUP_CONCAT(distinct if (SubjectList.NotSubjectList=0 AND DBRanking.TryTheseFirst<>1, SubjectList.Subject, NULL ) order by SubjectList.Subject separator ';')
+, '') AS subjects,
 1 AS desc_pos,
-'' AS lib_note,
+db.TutorialURL AS lib_note,
 0 AS enable_popular,
 db.MASKED AS enable_hidden,
 db.PrivateNotes AS internal_note,
@@ -30,11 +35,11 @@ db.PrivateNotes AS internal_note,
 FROM LuptonDB.Dbases AS db
 JOIN LuptonDB.Vendor
 ON db.Vendor_ID = Vendor.Vendor_ID
-JOIN LuptonDB.DBRanking
+LEFT JOIN LuptonDB.DBRanking
 ON db.Key_ID  = DBRanking.Key_ID
-JOIN LuptonDB.SubjectList
+LEFT JOIN LuptonDB.SubjectList
 ON DBRanking.Subject_ID = SubjectList.Subject_ID
-WHERE CANCELLED = 0 AND MASKED = 0 AND db.Key_ID > 200
+WHERE CANCELLED = 0 AND MASKED = 0 AND db.Key_ID <> 529
 GROUP BY db.Title
-ORDER BY db.Key_ID 
+ORDER BY db.Title
 ;
