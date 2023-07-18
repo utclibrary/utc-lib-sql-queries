@@ -4,9 +4,25 @@ db.Title AS name,
 db.URL AS url,
 (CASE db.NotProxy  WHEN 1 THEN 0 ELSE 1 END) AS enable_proxy,
 db.ShortDescription AS description,
-db.HighlightedInfo AS more_info,
-db.`New` AS enable_new,
-0 AS enable_trial,
+CONCAT(
+CASE
+	WHEN db.TutorialURL = '' OR db.TutorialURL IS NULL THEN
+    ''
+    ELSE
+    CONCAT ('<a href="', db.TutorialURL , '">', db.TutorialURL , '</a>')
+END,
+CASE 
+	WHEN db.HighlightedInfo = '' OR db.HighlightedInfo IS NULL THEN
+	''
+    ELSE
+    db.HighlightedInfo
+END
+) AS more_info,
+db.New AS enable_new,
+CASE 
+WHEN db.HighlightedInfo LIKE '%TRIAL%' THEN 1 ELSE 0 
+END 
+AS enable_trial,
 db.ContentType AS types,
 '' AS keywords,
 0 AS target,
@@ -25,7 +41,7 @@ IFNULL(
 GROUP_CONCAT(distinct if (SubjectList.NotSubjectList=0 AND DBRanking.TryTheseFirst<>1, SubjectList.Subject, NULL ) order by SubjectList.Subject separator ';')
 , '') AS subjects,
 1 AS desc_pos,
-db.TutorialURL AS lib_note,
+'' AS lib_note,
 0 AS enable_popular,
 db.MASKED AS enable_hidden,
 db.PrivateNotes AS internal_note,
@@ -41,5 +57,5 @@ LEFT JOIN LuptonDB.SubjectList
 ON DBRanking.Subject_ID = SubjectList.Subject_ID
 WHERE CANCELLED = 0 AND MASKED = 0 AND db.Key_ID <> 529
 GROUP BY db.Title
-ORDER BY db.Title
+ORDER BY db.Key_ID
 ;
