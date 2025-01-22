@@ -56,7 +56,7 @@ LEFT JOIN LuptonDB.DBRanking
 ON db.Key_ID  = DBRanking.Key_ID
 LEFT JOIN LuptonDB.SubjectList
 ON DBRanking.Subject_ID = SubjectList.Subject_ID
-WHERE CANCELLED = 0 AND MASKED = 0 AND db.Key_ID <> 529 AND db.Key_ID < 50
+WHERE CANCELLED = 0 AND MASKED = 0
 GROUP BY db.Title
 ORDER BY db.Key_ID
 ;
